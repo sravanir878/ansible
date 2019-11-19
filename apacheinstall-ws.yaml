@@ -1,0 +1,22 @@
+---
+- hosts: group1
+  tasks:
+  - name: installing the java
+    yum:
+       name: java
+       state: present
+  - name: downloading the tomcat
+    get_url:
+       url: http://mirrors.estointernet.in/apache/tomcat/tomcat-9/v9.0.27/bin/apache-tomcat-9.0.27.tar.gz
+       dest: /opt/apache-tomcat-9.0.27.tar.gz
+  - name: extracting the file
+    unarchive:
+       src: /opt/apache-tomcat-9.0.27.tar.gz
+       dest: /opt/apache-tomcat-9.0.27/
+       remote_src: yes
+  - name: starting the tomcat
+    script: /opt/apache-tomcat-9.0.27/bin/startup.sh start
+  - name: deploying the application
+    get_url:
+       url: https://www.oracle.com/webfolder/technetwork/tutorials/obe/fmw/wls/12c/12_1_3/03/apps/benefits.war
+       dest: /opt/apache-tomcat-9.0.27/webapps/benefits.war

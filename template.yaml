@@ -1,0 +1,11 @@
+---
+- hosts: group1
+  gather_facts: yes
+  vars:
+    admin_name: sravani
+  tasks:
+  - name: pushing the template to remote machines
+    template:
+      src: imp.j2
+      dest: /tmp/imp.conf
+

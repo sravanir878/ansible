@@ -1,0 +1,8 @@
+---
+- hosts: group1
+  tasks:
+  - name: replacing the text
+    replace:
+      path: /tmp/xyz.conf
+      regexp: 'v1.1'
+      replace: 'v1.2'

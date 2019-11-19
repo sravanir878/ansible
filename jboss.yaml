@@ -1,0 +1,20 @@
+---
+- hosts: group1
+  tasks:
+  - name: installing the java
+    yum: name={{item}} state=present
+    with_items:
+      - unzip
+      - java-1.8.0-openjdk
+  - name: creating a direcory
+    file:
+      path: /opt/jboss
+      state: directory
+      mode: 0755
+  - name: installing and unarchiveing the jboss
+    unarchive:
+      src: http://download.jboss.org/wildfly/10.0.0.Final/wildfly-10.0.0.Final.zip
+      dest: /opt/jboss
+      remote_src: yes
+  - name: Enable WildFly to be started at boot
+    service: name=jboss pattern=/opt/jboss state=started

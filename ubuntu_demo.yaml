@@ -1,0 +1,9 @@
+---
+- hosts: group1
+  tasks:
+  - name: installing the httpd
+    yum: name=httpd state=present
+    when: ansible_os_family=="Redhat"
+  - name: installing the apache2
+    apt: name=apache2 state=present
+    when: ansible_os_family=="Debian"

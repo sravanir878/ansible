@@ -1,0 +1,57 @@
+---
+- name: install java 1.7
+  yum: name=java-1.7.0-openjdk state=present
+- name: Download JBoss from jboss.org
+  get_url: 
+    url: http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip 
+    dest: /opt/jboss-as-7.1.1.Final.zip
+- name: unarchieve the file
+  unarchive: src=/opt/jboss-as-7.1.1.Final.zip dest=/usr/share creates=/usr/share/jboss-as remote_src=yes
+- name: renaming the directory
+  command: /bin/mv jboss-as-7.1.1.Final jboss-as
+  args:
+    chdir: /usr/share
+    creates: /usr/share/jboss-as
+- name: copying the standalone.xml file
+  template:
+    src: standalone.xml
+    dest: /usr/share/jboss-as/standalone/configuration/
+  notify: restart jboss
+- name: add the jboss group
+  group: name=jboss
+- name: add the jboss user to jboss group
+  user: name=jboss group=jboss home=/usr/share/jboss-as
+- name: change ownership of jboss application
+  file:
+    path: /usr/share/jboss-as/
+    owner: jboss
+    group: jboss
+    state: directory
+    recurse: yes
+- name: copy the init script
+  copy:
+    src: jboss-as-standalone.sh
+    dest: /etc/init.d/jboss
+    mode: 0755
+- name: Workaround for systemd bug
+  shell: service jboss start && chkconfig jboss on
+  ignore_errors: yes
+- name: Enable JBoss to be started at boot
+  service: name=jboss enabled=yes state=started
+- name: Copy application WAR file to host
+  get_url:
+    url: https://www.oracle.com/webfolder/technetwork/tutorials/obe/fmw/wls/12c/03-DeployApps/files/benefits.war
+    dest: /usr/share/jboss-as/webapps/benefits.war
+#- name: Deploying benefits.war file
+#  jboss:
+#    deploy_path: /usr/share/jboss-as/standalone/deployments/
+#    src: /tmp
+#    deployment: benefits.war
+#    state: present
+#- name: deploy iptables rules
+#  template:
+#    src: iptables-save
+#    dest: /etc/sysconfig/iptables
+#  when: ansible_distribution_major_version != "7"
+#  notify: restart iptables
+ 

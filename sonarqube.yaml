@@ -1,0 +1,31 @@
+---
+- hosts: group1
+  tasks:
+  - name: install java
+    yum: name=java state=present
+  - name: Create the sonar user for running the SonarQube services
+    user: name=demo_user
+  - name: Download SonarQube
+    get_url: url=https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.6.zip dest=/opt/sonarqube-7.6.zip
+  - name: Extract SonarQube
+    unarchive: src=/opt/sonarqube-7.6.zip dest=/opt remote_src=yes owner=demo_user
+  - name: Link this version of sonarqube as the server SonarQube version
+    file: src=/opt/sonarqube-7.6 dest=/opt/sonarqube state=link owner=demo_user
+  - name: Configure SonarQube to run as the sonar user
+    lineinfile: 
+      path: /opt/sonarqube/bin/linux-x86-64/sonar.sh
+      regexp: RUN_AS_USER=demo_user
+      insertafter: #RUN_AS_USER=
+      line: RUN_AS_USER=demo_user
+  - name: Copy the SonarQube service configuration file
+    copy:
+      src: sonarqube.service
+      dest: /etc/systemd/system/sonarqube.service
+# - name: start the SonarQube service
+#   shell: /opt/sonarqube/bin/linux-x86-64/sonar.sh start
+  - name: Enable the SonarQube service
+    systemd:
+      state: started
+      enabled: yes
+      daemon_reload: yes
+      name: sonarqube

@@ -1,0 +1,2 @@
+pkg_name: wget
+pkg_state: present

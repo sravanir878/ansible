@@ -1,0 +1,5 @@
+---
+- hosts: group1
+  roles:
+    - jboss-standalone
+#     - capitanh.jboss-ansible-role
